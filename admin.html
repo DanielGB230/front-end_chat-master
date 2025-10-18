@@ -2,79 +2,212 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Panel del Administrador</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
+      padding: 20px;
     }
 
     .admin-container {
-      background-color: white;
-      border-radius: 8px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 450px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 600px;
+    }
+
+    /* Header */
+    .admin-header {
+      background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+      color: white;
       padding: 20px;
-      width: 350px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
+    .admin-header h3 {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+
+    .admin-header p {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-top: 4px;
+    }
+
+    /* Chat Box */
     .chat-box {
-      height: 250px;
+      flex: 1;
       overflow-y: auto;
-      border: 1px solid #ccc;
-      margin-bottom: 10px;
-      padding: 10px;
-      background: #fafafa;
+      padding: 16px;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
+    .chat-box::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .chat-box::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .chat-box::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+
+    .chat-box::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    /* Messages */
     .message {
-      border-radius: 8px;
-      padding: 8px 10px;
-      margin-bottom: 8px;
+      display: flex;
+      animation: slideIn 0.3s ease-out;
+      word-wrap: break-word;
+      max-width: 85%;
     }
 
-    .client {
-      background: #e2f0ff;
-      text-align: left;
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    .admin {
-      background: #d1ffd6;
-      text-align: right;
+    .message.client {
+      justify-content: flex-start;
+    }
+
+    .message.client .message-content {
+      background: #e0e7ff;
+      color: #1e3a8a;
+      border-radius: 12px 12px 12px 4px;
+      padding: 10px 14px;
+      font-size: 14px;
+      line-height: 1.4;
+      box-shadow: 0 2px 8px rgba(30, 58, 138, 0.1);
+    }
+
+    .message.admin {
+      justify-content: flex-end;
+    }
+
+    .message.admin .message-content {
+      background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+      color: white;
+      border-radius: 12px 12px 4px 12px;
+      padding: 10px 14px;
+      font-size: 14px;
+      line-height: 1.4;
+      box-shadow: 0 2px 8px rgba(30, 58, 138, 0.2);
+    }
+
+    /* Input Area */
+    .input-area {
+      padding: 16px;
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      gap: 10px;
     }
 
     input {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
+      flex: 1;
+      padding: 12px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      background: #f8fafc;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #1e40af;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+    }
+
+    input::placeholder {
+      color: #94a3b8;
     }
 
     button {
-      width: 100%;
-      padding: 10px;
-      background: #007bff;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
       color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
     }
 
     button:hover {
-      background: #0056b3;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(30, 64, 175, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .admin-container {
+        height: 100vh;
+        max-width: 100%;
+        border-radius: 0;
+      }
+
+      .message {
+        max-width: 90%;
+      }
     }
   </style>
 </head>
 <body>
   <div class="admin-container">
-    <h3>Administrador</h3>
+    <div class="admin-header">
+      <h3>Panel de Administrador</h3>
+      <p>Gestiona las conversaciones con clientes</p>
+    </div>
     <div class="chat-box" id="chatBox"></div>
-    <input type="text" id="adminInput" placeholder="Escribe una respuesta...">
-    <button id="sendBtn">Enviar</button>
+    <div class="input-area">
+      <input type="text" id="adminInput" placeholder="Escribe una respuesta...">
+      <button id="sendBtn">Enviar</button>
+    </div>
   </div>
 
   <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
@@ -91,7 +224,10 @@
     adminChannel.bind("client-message", function(data) {
       const msg = document.createElement("div");
       msg.classList.add("message", "client");
-      msg.textContent = "Cliente: " + data.message;
+      const content = document.createElement("div");
+      content.classList.add("message-content");
+      content.textContent = data.message;
+      msg.appendChild(content);
       chatBox.appendChild(msg);
       chatBox.scrollTop = chatBox.scrollHeight;
     });
@@ -104,7 +240,10 @@
       // Mostrar mensaje local
       const msg = document.createElement("div");
       msg.classList.add("message", "admin");
-      msg.textContent = "Tú: " + message;
+      const content = document.createElement("div");
+      content.classList.add("message-content");
+      content.textContent = message;
+      msg.appendChild(content);
       chatBox.appendChild(msg);
       chatBox.scrollTop = chatBox.scrollHeight;
 
