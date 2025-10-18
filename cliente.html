@@ -97,7 +97,7 @@
         chatBox.scrollTop = chatBox.scrollHeight;
 
         // Enviar al backend
-        fetch("https://back-end-chat-master-daniel.onrender.com/", {
+        fetch("https://back-end-chat-master-daniel.onrender.com/client-send", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message })
