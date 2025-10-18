@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat del Cliente</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #222;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      background-color: #fff;
+      color: #000;
+      border-radius: 8px;
+      width: 320px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    .chat-box {
+      height: 250px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      background: #f7f7f7;
+    }
+
+    .message {
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      max-width: 80%;
+    }
+
+    .sent {
+      background-color: #dcf8c6;
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .received {
+      background-color: #ffe3e3;
+      margin-right: auto;
+      text-align: left;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <h3>Cliente</h3>
+    <div class="chat-box" id="chatBox"></div>
+    <input type="text" id="chatInput" placeholder="Escribe un mensaje...">
+  </div>
+
+  <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+  <script>
+    const chatBox = document.getElementById("chatBox");
+    const input = document.getElementById("chatInput");
+
+    // Configurar Pusher
+    const pusher = new Pusher("9918ec022ed3843a467c", { cluster: "sa1" });
+    const channel = pusher.subscribe("client-channel");
+
+    // Escuchar mensajes del admin
+    channel.bind("admin-message", function(data) {
+      const msg = document.createElement("div");
+      msg.classList.add("message", "received");
+      msg.textContent = "Admin: " + data.message;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    });
+
+    // Enviar mensaje al servidor
+    input.addEventListener("keydown", function(e) {
+      if (e.key === "Enter" && input.value.trim() !== "") {
+        const message = input.value.trim();
+
+        // Mostrar mensaje en el chat del cliente
+        const msg = document.createElement("div");
+        msg.classList.add("message", "sent");
+        msg.textContent = "Tú: " + message;
+        chatBox.appendChild(msg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        // Enviar al backend
+        fetch("http://127.0.0.1:5000/client-send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
+
+        input.value = "";
+      }
+    });
+  </script>
+</body>
+</html>
