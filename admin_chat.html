@@ -342,7 +342,7 @@
     // ============================================
     async function loadMessages() {
       try {
-        const response = await fetch(`http://127.0.0.1:5000/chat/messages/${CLIENT_ID}`);
+        const response = await fetch(`https://back-end-chat-master-daniel.onrender.com/chat/messages/${CLIENT_ID}`);
         const data = await response.json();
 
         if (data.messages && data.messages.length > 0) {
