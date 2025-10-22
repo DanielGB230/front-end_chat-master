@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat de Soporte</title>
+  <title>Chat - Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * {
@@ -24,7 +24,7 @@
       padding: 20px;
     }
 
-    .chat-container {
+    .admin-container {
       background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
       color: #1e293b;
       border-radius: 20px;
@@ -40,20 +40,46 @@
 
     .chat-header {
       margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    .chat-container h3 {
+    .back-btn {
+      background: #f1f5f9;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover {
+      background: #e2e8f0;
+      transform: translateX(-2px);
+    }
+
+    .header-info {
+      flex: 1;
+    }
+
+    .admin-container h3 {
       font-size: 18px;
       font-weight: 700;
-      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       letter-spacing: -0.5px;
-      margin-bottom: 5px;
+      margin-bottom: 3px;
     }
 
-    .client-id-display {
+    .client-id-subtitle {
       font-size: 11px;
       color: #94a3b8;
       font-weight: 500;
@@ -91,11 +117,11 @@
       background: #94a3b8;
     }
 
-    .welcome-message {
+    .empty-chat {
       text-align: center;
       color: #94a3b8;
       font-size: 13px;
-      padding: 20px;
+      padding: 40px 20px;
     }
 
     .message {
@@ -121,16 +147,16 @@
       }
     }
 
-    .sent {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    .admin {
+      background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
       color: white;
       margin-left: auto;
       text-align: right;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
       font-weight: 500;
     }
 
-    .received {
+    .client {
       background: #e2e8f0;
       color: #1e293b;
       margin-right: auto;
@@ -144,8 +170,14 @@
       margin-top: 4px;
     }
 
+    .input-container {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
     input {
-      width: 100%;
+      flex: 1;
       padding: 14px 16px;
       border-radius: 12px;
       border: 2px solid #e2e8f0;
@@ -163,8 +195,8 @@
     }
 
     input:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      border-color: #a855f7;
+      box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
       background: #f8fafc;
     }
 
@@ -172,8 +204,41 @@
       border-color: #cbd5e1;
     }
 
+    button {
+      padding: 14px 20px;
+      background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 50px;
+      height: 50px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(168, 85, 247, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     @media (max-width: 480px) {
-      .chat-container {
+      .admin-container {
         max-width: 100%;
         height: auto;
         min-height: 500px;
@@ -185,76 +250,95 @@
         font-size: 13px;
       }
 
-      .chat-container h3 {
+      .admin-container h3 {
         font-size: 16px;
+      }
+
+      .input-container {
+        gap: 10px;
+      }
+
+      button {
+        min-width: 45px;
+        height: 45px;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="chat-container">
+  <div class="admin-container">
     <div class="chat-header">
-      <h3>💬 Chat de Soporte</h3>
-      <div class="client-id-display" id="clientIdDisplay">Cargando...</div>
-    </div>
-    <div class="chat-box" id="chatBox">
-      <div class="welcome-message">
-        👋 ¡Hola! Escribe tu pregunta y te responderemos pronto
+      <button class="back-btn" onclick="goBack()">←</button>
+      <div class="header-info">
+        <h3 id="clientName">Cargando...</h3>
+        <div class="client-id-subtitle" id="clientIdSubtitle"></div>
       </div>
     </div>
-    <input type="text" id="chatInput" placeholder="Escribe un mensaje...">
+
+    <div class="chat-box" id="chatBox">
+      <div class="empty-chat">
+        Cargando conversación...
+      </div>
+    </div>
+
+    <div class="input-container">
+      <input type="text" id="adminInput" placeholder="Escribe una respuesta...">
+      <button id="sendBtn">✓</button>
+    </div>
   </div>
 
   <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
   <script>
     const chatBox = document.getElementById("chatBox");
-    const input = document.getElementById("chatInput");
-    const clientIdDisplay = document.getElementById("clientIdDisplay");
+    const input = document.getElementById("adminInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const clientNameEl = document.getElementById("clientName");
+    const clientIdSubtitleEl = document.getElementById("clientIdSubtitle");
 
     // ============================================
-    // GENERAR O RECUPERAR ID ÚNICO DEL CLIENTE
+    // OBTENER CLIENT_ID DE LA URL
     // ============================================
-    function getOrCreateClientId() {
-      let clientId = localStorage.getItem('chat_client_id');
-
-      if (!clientId) {
-        // Generar nuevo ID único
-        clientId = 'guest_' + Math.random().toString(36).substr(2, 12);
-        localStorage.setItem('chat_client_id', clientId);
-        console.log('🆕 Nuevo cliente creado:', clientId);
-      } else {
-        console.log('👤 Cliente existente:', clientId);
-      }
-
-      return clientId;
+    function getClientIdFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('client_id');
     }
 
-    const CLIENT_ID = getOrCreateClientId();
-    clientIdDisplay.textContent = `ID: ${CLIENT_ID}`;
+    const CLIENT_ID = getClientIdFromUrl();
+
+    if (!CLIENT_ID) {
+      alert('Error: No se especificó el cliente');
+      window.location.href = 'admin_list.html';
+    }
+
+    // Mostrar ID en el header
+    clientIdSubtitleEl.textContent = CLIENT_ID;
 
     // ============================================
     // CONFIGURAR PUSHER
     // ============================================
     const pusher = new Pusher("9918ec022ed3843a467c", { cluster: "sa1" });
-    const channel = pusher.subscribe(`client-${CLIENT_ID}-channel`);
+    const adminChannel = pusher.subscribe("admin-channel");
 
-    // Escuchar mensajes del admin en tiempo real
-    channel.bind("admin-message", function (data) {
-      console.log('📩 Mensaje del admin recibido:', data);
+    // Escuchar nuevos mensajes del cliente
+    adminChannel.bind("new-client-message", function (data) {
+      // Solo mostrar si es del cliente actual
+      if (data.client_id === CLIENT_ID) {
+        console.log('📩 Nuevo mensaje del cliente');
 
-      const msg = document.createElement("div");
-      msg.classList.add("message", "received");
-      msg.innerHTML = `
-        <div>Admin: ${escapeHtml(data.message)}</div>
-        <div class="message-time">${getCurrentTime()}</div>
-      `;
-      chatBox.appendChild(msg);
-      scrollToBottom();
+        const msg = document.createElement("div");
+        msg.classList.add("message", "client");
+        msg.innerHTML = `
+          <div>Cliente: ${escapeHtml(data.message)}</div>
+          <div class="message-time">${getCurrentTime()}</div>
+        `;
+        chatBox.appendChild(msg);
+        scrollToBottom();
+      }
     });
 
     // ============================================
-    // CARGAR MENSAJES ANTERIORES
+    // CARGAR MENSAJES EXISTENTES
     // ============================================
     async function loadMessages() {
       try {
@@ -262,16 +346,19 @@
         const data = await response.json();
 
         if (data.messages && data.messages.length > 0) {
-          // Limpiar mensaje de bienvenida
           chatBox.innerHTML = '';
+
+          // Generar nombre para mostrar
+          const displayName = generateDisplayName(CLIENT_ID);
+          clientNameEl.textContent = displayName;
 
           data.messages.forEach(msg => {
             const messageDiv = document.createElement("div");
-            const isSent = msg.remitente === CLIENT_ID;
-            messageDiv.classList.add("message", isSent ? "sent" : "received");
+            const isAdmin = msg.remitente === 'admin';
+            messageDiv.classList.add("message", isAdmin ? "admin" : "client");
 
             const time = msg.fecha_envio ? formatTime(msg.fecha_envio) : '';
-            const sender = isSent ? "Tú" : "Admin";
+            const sender = isAdmin ? "Tú" : "Cliente";
 
             messageDiv.innerHTML = `
               <div>${sender}: ${escapeHtml(msg.contenido)}</div>
@@ -281,22 +368,28 @@
           });
 
           scrollToBottom();
+        } else {
+          chatBox.innerHTML = '<div class="empty-chat">No hay mensajes aún. Inicia la conversación.</div>';
+          clientNameEl.textContent = generateDisplayName(CLIENT_ID);
         }
       } catch (error) {
-        console.log('Sin mensajes previos o error:', error);
+        console.error('Error al cargar mensajes:', error);
+        chatBox.innerHTML = '<div class="empty-chat">Error al cargar mensajes</div>';
       }
     }
 
     // ============================================
-    // ENVIAR MENSAJE
+    // ENVIAR MENSAJE DEL ADMIN
     // ============================================
-    async function sendMessage() {
+    async function sendAdminMessage() {
       const message = input.value.trim();
       if (message === "") return;
 
+      sendBtn.disabled = true;
+
       // Mostrar mensaje inmediatamente
       const msg = document.createElement("div");
-      msg.classList.add("message", "sent");
+      msg.classList.add("message", "admin");
       msg.innerHTML = `
         <div>Tú: ${escapeHtml(message)}</div>
         <div class="message-time">${getCurrentTime()}</div>
@@ -307,7 +400,7 @@
 
       // Enviar al backend
       try {
-        await fetch("https://back-end-chat-master-daniel.onrender.com/chat/client-send", {
+        await fetch("https://back-end-chat-master-daniel.onrender.com/chat/admin-send", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -318,17 +411,29 @@
       } catch (error) {
         console.error('Error al enviar:', error);
         alert('Error al enviar el mensaje');
+      } finally {
+        sendBtn.disabled = false;
+        input.focus();
       }
     }
 
     // ============================================
     // EVENT LISTENERS
     // ============================================
-    input.addEventListener("keydown", function (e) {
+    sendBtn.addEventListener("click", sendAdminMessage);
+
+    input.addEventListener("keydown", e => {
       if (e.key === "Enter") {
-        sendMessage();
+        sendAdminMessage();
       }
     });
+
+    // ============================================
+    // NAVEGACIÓN
+    // ============================================
+    function goBack() {
+      window.location.href = 'admin_list.html';
+    }
 
     // ============================================
     // UTILIDADES
@@ -353,6 +458,15 @@
       });
     }
 
+    function generateDisplayName(clientId) {
+      if (clientId === "admin") return "Administrador";
+      if (clientId === "cliente") return "Cliente Único";
+
+      // Tomar últimos 4 caracteres
+      const short = clientId.slice(-4);
+      return `Visitante #${short}`;
+    }
+
     function escapeHtml(text) {
       const map = {
         '&': '&amp;',
@@ -368,10 +482,10 @@
     // INICIALIZAR
     // ============================================
     loadMessages();
+    input.focus();
 
-    console.log('✅ Chat inicializado');
-    console.log('📱 Tu ID:', CLIENT_ID);
-    console.log('📡 Canal Pusher:', `client-${CLIENT_ID}-channel`);
+    console.log('✅ Chat admin inicializado');
+    console.log('👤 Cliente actual:', CLIENT_ID);
   </script>
 </body>
 
