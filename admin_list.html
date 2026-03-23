@@ -24,21 +24,31 @@
             padding: 20px;
         }
 
-        .container {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            color: #1e293b;
+        .main-container {
+            background: #ffffff;
             border-radius: 20px;
             width: 100%;
-            max-width: 500px;
+            max-width: 1400px;
+            height: 85vh;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             overflow: hidden;
-            max-height: 90vh;
+            display: flex;
+        }
+
+        /* LISTA DE CLIENTES */
+        .clients-section {
+            width: 400px;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
         }
 
         .header {
-            background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+            background: linear-gradient(135deg, #91ABE7 0%, #B792C6 100%);
             color: white;
             padding: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .header h2 {
@@ -54,7 +64,7 @@
 
         .clients-list {
             overflow-y: auto;
-            max-height: calc(90vh - 100px);
+            flex: 1;
         }
 
         .clients-list::-webkit-scrollbar {
@@ -74,10 +84,16 @@
             cursor: pointer;
             transition: all 0.2s;
             gap: 12px;
+            color: #1e293b;
         }
 
         .client-item:hover {
             background: #f8fafc;
+        }
+
+        .client-item.active {
+            background: #ede9fe;
+            border-left: 3px solid #a855f7;
         }
 
         .client-avatar {
@@ -169,52 +185,123 @@
             color: #94a3b8;
         }
 
-        @media (max-width: 480px) {
-            .container {
+        /* CHAT SECTION */
+        .chat-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f8fafc;
+        }
+
+        .chat-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #94a3b8;
+            gap: 16px;
+        }
+
+        .chat-placeholder-icon {
+            font-size: 80px;
+            opacity: 0.3;
+        }
+
+        .chat-placeholder-text {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .chat-placeholder-subtext {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        #chatFrame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .main-container {
                 max-width: 100%;
                 border-radius: 0;
-                max-height: 100vh;
+                height: 100vh;
             }
 
-            .client-item {
-                padding: 14px 16px;
+            .clients-section {
+                width: 350px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .clients-section {
+                width: 100%;
+                border-right: none;
             }
 
-            .client-avatar {
-                width: 42px;
-                height: 42px;
-                font-size: 16px;
+            .chat-section {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 1000;
+                display: none;
+            }
+
+            .chat-section.mobile-active {
+                display: flex;
+            }
+
+            .clients-section.mobile-hidden {
+                display: none;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="header">
-            <h2>💬 Mensajes</h2>
-            <p>Conversaciones activas</p>
+    <div class="main-container">
+        <!-- LISTA DE CLIENTES -->
+        <div class="clients-section" id="clientsSection">
+            <div class="header">
+                <h2>💬 Mensajes</h2>
+                <p>Conversaciones activas</p>
+            </div>
+
+            <div class="clients-list" id="clientsList">
+                <div class="loading">
+                    Cargando conversaciones...
+                </div>
+            </div>
         </div>
 
-        <div class="clients-list" id="clientsList">
-            <div class="loading">
-                Cargando conversaciones...
+        <!-- CHAT SECTION -->
+        <div class="chat-section" id="chatSection">
+            <div class="chat-placeholder">
+                <div class="chat-placeholder-icon">💬</div>
+                <div class="chat-placeholder-text">Selecciona una conversación</div>
+                <div class="chat-placeholder-subtext">Elige un cliente de la lista para comenzar a chatear</div>
             </div>
         </div>
     </div>
 
     <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
     <script>
-        // ============================================
+        let currentClientId = null;
+
         // CONFIGURAR PUSHER
-        // ============================================
         const pusher = new Pusher("9918ec022ed3843a467c", { cluster: "sa1" });
         const adminChannel = pusher.subscribe("admin-channel");
 
         // Escuchar nuevos mensajes de clientes
         adminChannel.bind("new-client-message", function (data) {
             console.log('📩 Nuevo mensaje de:', data.client_id);
-            loadClients(); // Recargar lista
+            loadClients();
 
             // Notificación visual
             if (Notification.permission === "granted") {
@@ -224,9 +311,7 @@
             }
         });
 
-        // ============================================
         // CARGAR LISTA DE CLIENTES
-        // ============================================
         async function loadClients() {
             try {
                 const response = await fetch('https://back-end-chat-master-daniel.onrender.com/chat/clients');
@@ -247,57 +332,76 @@
             const container = document.getElementById('clientsList');
 
             container.innerHTML = clients.map(client => `
-        <div class="client-item" onclick="openChat('${client.client_id}')">
-          <div class="client-avatar">
-            ${getAvatarLetter(client.display_name)}
-          </div>
-          <div class="client-info">
-            <div class="client-name">
-              ${escapeHtml(client.display_name)}
-              ${client.client_id.startsWith('guest_') ? '<span class="badge-visitante">Visitante</span>' : ''}
-            </div>
-            <div class="client-last-message">
-              ${escapeHtml(client.last_message) || 'Sin mensajes'}
-            </div>
-          </div>
-          <div class="client-meta">
-            <div class="client-time">${formatTime(client.last_timestamp)}</div>
-            ${client.unread_count > 0 ? `<div class="unread-badge">${client.unread_count}</div>` : ''}
-          </div>
-        </div>
-      `).join('');
+                <div class="client-item ${currentClientId === client.client_id ? 'active' : ''}" 
+                     onclick="openChat('${client.client_id}')">
+                    <div class="client-avatar">
+                        ${getAvatarLetter(client.display_name)}
+                    </div>
+                    <div class="client-info">
+                        <div class="client-name">
+                            ${escapeHtml(client.display_name)}
+                            ${client.client_id.startsWith('guest_') ? '<span class="badge-visitante">Visitante</span>' : ''}
+                        </div>
+                        <div class="client-last-message">
+                            ${escapeHtml(client.last_message) || 'Sin mensajes'}
+                        </div>
+                    </div>
+                    <div class="client-meta">
+                        <div class="client-time">${formatTime(client.last_timestamp)}</div>
+                        ${client.unread_count > 0 ? `<div class="unread-badge">${client.unread_count}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
         }
 
         function showEmptyState() {
             const container = document.getElementById('clientsList');
             container.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-state-icon">💬</div>
-          <div>No hay conversaciones aún</div>
-        </div>
-      `;
+                <div class="empty-state">
+                    <div class="empty-state-icon">💬</div>
+                    <div>No hay conversaciones aún</div>
+                </div>
+            `;
         }
 
         function showError() {
             const container = document.getElementById('clientsList');
             container.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-state-icon">⚠️</div>
-          <div>Error al cargar conversaciones</div>
-        </div>
-      `;
+                <div class="empty-state">
+                    <div class="empty-state-icon">⚠️</div>
+                    <div>Error al cargar conversaciones</div>
+                </div>
+            `;
         }
 
-        // ============================================
-        // ABRIR CHAT INDIVIDUAL
-        // ============================================
+        // ABRIR CHAT EN IFRAME
         function openChat(clientId) {
-            window.location.href = `admin_chat.html?client_id=${clientId}`;
+            currentClientId = clientId;
+
+            const chatSection = document.getElementById('chatSection');
+            chatSection.innerHTML = `<iframe id="chatFrame" src="admin_chat.html?client_id=${clientId}&embedded=true"></iframe>`;
+
+            // Marcar como activo en la lista
+            loadClients();
+
+            // En móvil, ocultar lista y mostrar chat
+            if (window.innerWidth <= 768) {
+                document.getElementById('clientsSection').classList.add('mobile-hidden');
+                chatSection.classList.add('mobile-active');
+            }
         }
 
-        // ============================================
+        // Escuchar mensajes del iframe para cerrar en móvil
+        window.addEventListener('message', function (event) {
+            if (event.data === 'close-chat') {
+                if (window.innerWidth <= 768) {
+                    document.getElementById('clientsSection').classList.remove('mobile-hidden');
+                    document.getElementById('chatSection').classList.remove('mobile-active');
+                }
+            }
+        });
+
         // UTILIDADES
-        // ============================================
         function formatTime(timestamp) {
             if (!timestamp) return '';
 
@@ -305,7 +409,6 @@
             const now = new Date();
             const diff = now - date;
 
-            // Menos de 24 horas: mostrar hora
             if (diff < 86400000) {
                 return date.toLocaleTimeString('es-ES', {
                     hour: '2-digit',
@@ -313,7 +416,6 @@
                 });
             }
 
-            // Más de 24 horas: mostrar fecha
             return date.toLocaleDateString('es-ES', {
                 day: '2-digit',
                 month: '2-digit'
@@ -337,19 +439,13 @@
             return text.replace(/[&<>"']/g, m => map[m]);
         }
 
-        // ============================================
         // PEDIR PERMISOS DE NOTIFICACIÓN
-        // ============================================
         if (Notification.permission === "default") {
             Notification.requestPermission();
         }
 
-        // ============================================
         // INICIALIZAR
-        // ============================================
         loadClients();
-
-        // Recargar cada 30 segundos
         setInterval(loadClients, 30000);
 
         console.log('✅ Panel admin inicializado');
